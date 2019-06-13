@@ -1,0 +1,180 @@
+
+USE [V5A8]
+GO
+/****** Object:  StoredProcedure [dbo].[Txn_getDepartmentActivitiCountByTime]    Script Date: 2019/6/13 8:33:42 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+/***
+ 根据时间节点按部门统计   各流程的基本信息总计，（包括已发总数，代办总数，已办总数，超期数量，累计超期时间）
+
+*/
+
+ALTER PROCEDURE [dbo].[Txn_getDepartmentActivitiCountByTime]
+@I_ReturnMessage nvarchar(max)='' output,  --返回的信息,支持多语言
+@time1  DATE,
+@time2  DATE
+AS
+BEGIN
+
+
+	
+	SET NOCOUNT ON;
+	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED  --20180118
+	SET XACT_ABORT ON
+	
+
+	IF  isnull(@time1,'')='' OR isnull(@time2,'')=''
+	BEGIN
+        SET   @I_ReturnMessage='servermessage:起始时间必须传入！'
+		RETURN  -1
+	END
+    
+
+	SELECT 
+  affair.STATE,affair.SUBJECT AS activitiInstanceName, affair.IS_COVER_TIME,affair.CREATE_DATE,affair.RECEIVE_TIME,affair.COMPLETE_TIME,affair.NODE_POLICY,
+  affair.OVER_WORKTIME af_over_worktime, --超期时间工作时间计算
+  affair.RUN_WORKTIME af_run_worktime,    --运行时间按工作时间计算
+  affair.OVER_TIME af_over_time,    --超期时间按自然时间
+  affair.RUN_TIME af_run_time,      --运行时间按自然时间
+  summary.OVER_WORKTIME summary_over_worktime,
+  summary.RUN_WORKTIME summary_run_worktime ,
+  summary.OVER_TIME summary_over_time,
+  summary.RUN_TIME  summary_run_time,
+  summary.DEADLINE_DATETIME,
+  template.SUBJECT  AS   acitivitiName,
+  member.NAME  AS  peopleName,
+  unit.NAME  AS  deptName  INTO  #t
+    FROM  dbo.CTP_AFFAIR  affair
+  INNER JOIN  dbo.COL_SUMMARY summary ON  affair.OBJECT_ID=summary.ID
+  INNER JOIN  dbo.CTP_TEMPLATE  template  ON template.id=summary.TEMPLETE_ID
+  INNER JOIN  dbo.ORG_MEMBER  member ON affair.MEMBER_ID = member.ID
+  INNER JOIN   dbo.ORG_UNIT  unit  ON  unit.id=member.ORG_DEPARTMENT_ID  
+  WHERE  cAST(summary.CREATE_DATE  AS  date)>=@time1  AND   cast(summary.CREATE_DATE AS  DATE)<=@time2 
+  AND  affair.STATE  IN  (2,3,4)  AND  affair.BODY_TYPE='20'
+  ORDER  BY  affair.TEMPLETE_ID
+
+
+  --select    deptName,acitivitiName,IS_COVER_TIME,summary_over_time, summary_run_time, 
+  --ROW_NUMBER() OVER  (PARTITION BY deptName,acitivitiName ORDER BY  acitivitiName,STATE) AS num,STATE  FROM  #t  
+  --ORDER  BY  acitivitiName 
+  
+  SELECT   acitivitiName, deptName,STATE AS _status,COUNT(1) AS activitiCount INTO   #t2 FROM  #t 
+   GROUP  BY  acitivitiName, deptName,state 
+
+ 
+
+  
+
+
+	 SELECT    t1.acitivitiName,	t1.deptName,	
+	 CASE WHEN [2] IS NULL THEN  0 ELSE  [2] end  AS 'submit' 
+	 ,CASE  WHEN [3] IS NULL  THEN 0 ELSE [3] END AS 'waitforDeal' ,ISNULL([4],0) AS 'deal',		
+	 ISNULL(overtime_count,0) AS overtime_count,	
+	ISNULL(CAST(t2.overtime_sum AS NVARCHAR(50)),'-') AS overtime_sum
+	  FROM  
+   (SELECT   *  FROM   #t2   PIVOT(avg(activitiCount) FOR _status IN([2] ,[3],[4])) AS  pvt
+    )  t1 
+   LEFT  JOIN 
+   ( SELECT   acitivitiName,deptName, COUNT(1) AS overtime_count,SUM(summary_over_time) overtime_sum FROM    #t 
+  WHERE  IS_COVER_TIME=1 GROUP  BY  acitivitiName, deptName)  t2 
+  ON  t2.deptName = t1.deptName AND  t2.acitivitiName = t1.acitivitiName
+  ORDER BY  t1.acitivitiName
+
+    
+   
+	DROP  TABLE  #t,#t2
+    
+    SET  @I_ReturnMessage='ServerMessage:成功!  '
+	
+END
+
+
+--EXEC [Txn_getDepartmentActivitiCountByTime] @time1='2019-04-01',@time2='2019-04-30'
+--------------------------------------------------------------------------------------------------------------------------------------
+USE [V5A8]
+GO
+/****** Object:  StoredProcedure [dbo].[Txn_getActivitiDetailByTimeAndPeople]    Script Date: 2019/6/13 8:39:40 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+/***
+ 根据时间节点和人员 2个条件 查询出人员的流程流水 然后每日补齐相关数据
+
+*/
+
+ALTER PROCEDURE [dbo].[Txn_getActivitiDetailByTimeAndPeople]
+@I_ReturnMessage nvarchar(max)='' output,  --返回的信息,支持多语言
+@people NVARCHAR(50),
+@time1  DATE,
+@time2  DATE
+AS
+BEGIN
+
+
+	
+	SET NOCOUNT ON;
+	SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED 
+	SET XACT_ABORT ON
+	
+
+	IF  isnull(@time1,'')='' OR isnull(@time2,'')=''
+	BEGIN
+        SET   @I_ReturnMessage='servermessage:起始时间必须传入！'
+		RETURN  -1
+	END
+    --简单拼下每天的时间
+	 DECLARE  @t  TABLE(
+   num  INT IDENTITY(1,1),
+   _day  date
+  )
+   DECLARE  @currentDay  DATE=@time1
+   WHILE  @currentDay<=@time2
+   BEGIN 
+      INSERT  INTO  @t(_day)  VALUES(@currentDay)
+	  SET  @currentDay=DATEADD(DAY,1,@currentDay)
+   END
+
+
+
+
+ SELECT  num,pvt._day,ISNULL([pvt].[2],0) AS submit,ISNULL([pvt].[3],0) AS waitforDeal,ISNULL([pvt].[4],0) AS deal  FROM (
+	   SELECT   num,a._day,b.STATE,b._count  FROM  @t a left JOIN  
+	   (
+		   SELECT   t_zi._day,t_zi.STATE,COUNT(1) _count FROM  
+		   (
+			   SELECT 
+			   cast  (affair.CREATE_DATE  AS  DATE) _day,
+			   affair.CREATE_DATE,
+			   template.SUBJECT  AS   acitivitiName,
+			  affair.STATE,
+			   affair.SUBJECT AS activitiInstanceName,
+			   unit.NAME  AS  deptName ,
+			   affair.OVER_TIME af_over_time,   
+			  affair.RUN_TIME af_run_time      
+				FROM  dbo.CTP_AFFAIR  affair
+			  INNER JOIN  dbo.COL_SUMMARY summary ON  affair.OBJECT_ID=summary.ID
+			  INNER JOIN  dbo.CTP_TEMPLATE  template  ON template.id=summary.TEMPLETE_ID
+			  INNER JOIN  dbo.ORG_MEMBER  member ON affair.MEMBER_ID = member.ID
+			  INNER JOIN   dbo.ORG_UNIT  unit  ON  unit.id=member.ORG_DEPARTMENT_ID  
+			  WHERE  cAST(summary.CREATE_DATE  AS  date)>=@time1  AND   cast(summary.CREATE_DATE AS  DATE)<=@time2 
+			  AND  affair.STATE  IN  (2,3,4)  AND  affair.BODY_TYPE='20' AND  member.NAME=@people
+			) t_zi  GROUP BY  t_zi._day,t_zi.STATE
+	  ) b 
+	  ON  a._day=b._day
+ )origin 
+    PIVOT(AVG(_count) FOR STATE IN([2],[3],[4])) AS pvt
+   
+	
+    SET  @I_ReturnMessage='ServerMessage:成功!  '
+	
+END
+
+
+--exec  [Txn_getActivitiDetailByTimeAndPeople] @people='孙佳兵',@time1='2019-04-01',@time2='2019-04-30'
+
+
+
+

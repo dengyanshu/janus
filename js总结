@@ -1,0 +1,241 @@
+1、相同的id jquery 去取可能值取到一个
+2、$("#id").parent("可写选择器") 只能取到相邻的父亲   可写 $("#id").parent().parent()
+3、window.setTimeout(function(){},1000)  会执行下面的代码 然后延时后执行方法内部代码
+
+
+$(function(){
+	if(window.form == null){
+		return;
+	}
+	if(!form || form.id != '-5933933232874503251'){ // 不是我要的表单 测试 -5933933232874503251 
+		// alert("不是我要的表单!");
+		return ;
+	}
+	
+  //这样写有效果
+	$("#field0017").parent().parent().find("font").attr("onclick","").click(function(){
+          $("input[name='field0009_txt']").each(function(i){
+			
+		    var deptcode=$(this).parents("span").find("input").first().val();
+		    if(deptcode==null||deptcode.length==0){
+				return ;
+			}
+		    var deptcodeid_str=$(this).parents("span").find("input").last().val();
+			var deptcodeid=deptcodeid_str.split("|")[1];
+			var  data=getdata(deptcodeid);
+			$(this).parents("tr").find("#field0010_txt").first().attr("title",data.field0010_txt);
+			$(this).parents("tr").find("#field0010_txt").first().val(data.field0010_txt);
+			$(this).parents("tr").find("#field0010").first().attr("value",data.field0010);
+			
+			$(this).parents("tr").find("#field0011_txt").first().attr("title",data.field0011_txt);
+			$(this).parents("tr").find("#field0011_txt").first().val(data.field0011_txt);
+			$(this).parents("tr").find("#field0011").first().attr("value",data.field0011);
+			
+			$(this).parents("tr").find("#field0012_txt").first().attr("title",data.field0012_txt);
+			$(this).parents("tr").find("#field0012_txt").first().val(data.field0012_txt);
+			$(this).parents("tr").find("#field0012").first().attr("value",data.field0012);
+		    
+		});
+	});
+  //隐藏
+	$("#field0017").css("display","none");
+	
+	
+	
+	 
+	
+	//3955477395410079400=fj
+	//Member|-7103631628892091064=hjm
+	//Member|-3129720805653721591=sh
+	function getdata(deptcodeid){
+		var  data=null;
+		
+		$.ajax({
+			
+			url:"/seeyon/plugin/janusall/test/department.jsp",
+			data:{"deptId":deptcodeid},
+			dataType:'json',
+			type:'post',
+			async: false,
+			success:function(rdata){
+				data=rdata;
+			},
+			error: function (XMLHttpRequest, textStatus, errorThrown) {
+				
+				alert("error："+errorThrown);
+			}
+		});
+		
+		return  data;
+		/**
+		 * 测试用数据
+		 * 
+		 * 
+		if("-6231096950749114403"==deptcodeid){
+			data={
+					"field0010_txt":"fj",
+					"field0010":"Member|3955477395410079400"
+					
+			}
+			/*$("#field0010_txt").attr("title","fj");
+			$("#field0010_txt").text("fj");
+			$("#field0010").attr("value","Member|3955477395410079400");
+		}
+		else{
+			data={
+				"field0010_txt":"hjm、sh",
+				"field0010":"Member|-7103631628892091064,Member|-3129720805653721591"
+			}
+		}
+		
+		return  data;
+		*/
+	}
+	
+	
+	
+	//var  deptcode_1="";
+	//var  deptcode_2="";
+	//var  deptcode_3="";
+	//var  deptcode_4="";
+	
+	window.setTimeout(window['-5933933232874503251'] = function(){
+		/*
+		 *只能监听到blur 事件 需要用户失去下焦点才可以触发 
+		 * $(document).on("blur","#field0009_txt",function(){
+			alert("input here");
+			alert($(this).parents("tr").find("#field0010_txt").size());
+			var deptcode=$(this).parents("span").find("input").first().val();
+			var depacodeid_str=$(this).parents("span").find("input").last().val();//Department|-6231096950749114403
+			var depacodeid=depacodeid_str.split("|")[1];
+			var  data=getdata(depacodeid);
+			var  field0010_txt=data.field0010_txt;
+			alert(field0010_txt);
+			//开始赋值
+			$(this).parents("tr").find("#field0010_txt").first().attr("title",field0010_txt);
+			$(this).parents("tr").find("#field0010_txt").first().val(field0010_txt);
+			$(this).parents("tr").find("#field0010").first().attr("value",data.field0010);
+		});*/
+		
+        /**不能通过id 否则只能取到一个 
+		console.log( $("input[name='field0009_txt']").size());
+		$("input[name='field0009_txt']") .removeAttr("readonly");
+      */
+		//$("input[name='field0009_txt']") .attr("oninput","alert(this.value);");   添加js事件也不行
+		
+		/**
+		$("input[name='field0009_txt']").each(function(i){
+			
+		    var deptcode=$(this).parents("span").find("input").first().val();
+		    if(deptcode==null||deptcode.length==0){
+				return ;
+			}
+		    console.log("deptcode="+deptcode+",i="+i);
+		    if(i==0){
+		       if(deptcode_1!=deptcode){
+		    	    deptcode_1=deptcode;
+			        console.log("第1行重新获取赋值")
+		           //continue; continue不能使用 ==return true;会跳出当前循环
+				    var deptcodeid_str=$(this).parents("span").find("input").last().val();
+					var deptcodeid=deptcodeid_str.split("|")[1];
+					var  data=getdata(deptcodeid);
+					$(this).parents("tr").find("#field0010_txt").first().attr("title",data.field0010_txt);
+					$(this).parents("tr").find("#field0010_txt").first().val(data.field0010_txt);
+					$(this).parents("tr").find("#field0010").first().attr("value",data.field0010);
+					
+					$(this).parents("tr").find("#field0011_txt").first().attr("title",data.field0011_txt);
+					$(this).parents("tr").find("#field0011_txt").first().val(data.field0011_txt);
+					$(this).parents("tr").find("#field0011").first().attr("value",data.field0011);
+					
+					$(this).parents("tr").find("#field0012_txt").first().attr("title",data.field0012_txt);
+					$(this).parents("tr").find("#field0012_txt").first().val(data.field0012_txt);
+					$(this).parents("tr").find("#field0012").first().attr("value",data.field0012);
+			       
+		       }
+		    }
+		    if(i==1){
+		    	 if(deptcode_2!=deptcode){
+			    	   deptcode_2=deptcode;
+				       console.log("第2行重新获取赋值")
+			          //continue; continue不能使用 ==return true;会跳出当前循环
+				       var deptcodeid_str=$(this).parents("span").find("input").last().val();
+					var deptcodeid=deptcodeid_str.split("|")[1];
+					var  data=getdata(deptcodeid);
+					$(this).parents("tr").find("#field0010_txt").first().attr("title",data.field0010_txt);
+					$(this).parents("tr").find("#field0010_txt").first().val(data.field0010_txt);
+					$(this).parents("tr").find("#field0010").first().attr("value",data.field0010);
+					
+					$(this).parents("tr").find("#field0011_txt").first().attr("title",data.field0011_txt);
+					$(this).parents("tr").find("#field0011_txt").first().val(data.field0011_txt);
+					$(this).parents("tr").find("#field0011").first().attr("value",data.field0011);
+					
+					$(this).parents("tr").find("#field0012_txt").first().attr("title",data.field0012_txt);
+					$(this).parents("tr").find("#field0012_txt").first().val(data.field0012_txt);
+					$(this).parents("tr").find("#field0012").first().attr("value",data.field0012);
+			     }
+		    }
+		    if(i==2){
+		    	 if(deptcode_3!=deptcode){
+			    	   deptcode_3=deptcode;
+				       console.log("第3行重新获取赋值")
+			          //continue; continue不能使用 ==return true;会跳出当前循环
+				       var deptcodeid_str=$(this).parents("span").find("input").last().val();
+					var deptcodeid=deptcodeid_str.split("|")[1];
+					var  data=getdata(deptcodeid);
+					$(this).parents("tr").find("#field0010_txt").first().attr("title",data.field0010_txt);
+					$(this).parents("tr").find("#field0010_txt").first().val(data.field0010_txt);
+					$(this).parents("tr").find("#field0010").first().attr("value",data.field0010);
+					
+					$(this).parents("tr").find("#field0011_txt").first().attr("title",data.field0011_txt);
+					$(this).parents("tr").find("#field0011_txt").first().val(data.field0011_txt);
+					$(this).parents("tr").find("#field0011").first().attr("value",data.field0011);
+					
+					$(this).parents("tr").find("#field0012_txt").first().attr("title",data.field0012_txt);
+					$(this).parents("tr").find("#field0012_txt").first().val(data.field0012_txt);
+					$(this).parents("tr").find("#field0012").first().attr("value",data.field0012);
+			     }
+		    }
+		    if(i==3){
+		    	 if(deptcode_4!=deptcode){
+			    	   deptcode_4=deptcode;
+				       console.log("第4行重新获取赋值")
+			          //continue; continue不能使用 ==return true;会跳出当前循环
+				       var deptcodeid_str=$(this).parents("span").find("input").last().val();
+					var deptcodeid=deptcodeid_str.split("|")[1];
+					var  data=getdata(deptcodeid);
+					$(this).parents("tr").find("#field0010_txt").first().attr("title",data.field0010_txt);
+					$(this).parents("tr").find("#field0010_txt").first().val(data.field0010_txt);
+					$(this).parents("tr").find("#field0010").first().attr("value",data.field0010);
+					
+					$(this).parents("tr").find("#field0011_txt").first().attr("title",data.field0011_txt);
+					$(this).parents("tr").find("#field0011_txt").first().val(data.field0011_txt);
+					$(this).parents("tr").find("#field0011").first().attr("value",data.field0011);
+					
+					$(this).parents("tr").find("#field0012_txt").first().attr("title",data.field0012_txt);
+					$(this).parents("tr").find("#field0012_txt").first().val(data.field0012_txt);
+					$(this).parents("tr").find("#field0012").first().attr("value",data.field0012);
+			     }
+			}
+		});*/
+		   
+		
+		
+		
+		
+		
+		
+	}, 1000);
+	
+    
+	//动态绑定事件 也监听不到 只有键盘鼠标动作才能监听到
+	 $(document).on("input propertychange","input[name='field0009_txt']", function(){
+		 alert("4445555---------");
+	 });
+	 
+
+	
+})
+
+
+
+

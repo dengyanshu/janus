@@ -22,3 +22,10 @@ cnpm i vue-cli -g
 
 4、npm run dev 开启工程
   
+-------------------vue项目
+1、index.html   <body style="background-color:white">  整个app会是白色主基调
+2、app.vue  padding-top:40px 留出title位置   overflow-X:hidden;//动画的时候不会飘
+3、v-enter  与v-leave-to 分开写  
+   transform:translateX（100%或者-100%）进入的时候100%横向 v-leave-to 离开的时候-100%从页面最左边离开效果
+   position:absloute;可以解决页面上下跳动
+4、v-enter-active  v-leave-active

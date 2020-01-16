@@ -29,3 +29,32 @@ cnpm i vue-cli -g
    transform:translateX（100%或者-100%）进入的时候100%横向 v-leave-to 离开的时候-100%从页面最左边离开效果
    position:absloute;可以解决页面上下跳动
 4、v-enter-active  v-leave-active
+
+5、使用axios跨域请求数据
+  import axios  from 'axios'
+  import VueAxios from 'vue-axios'
+  Vue.use(VueAxios, axios)
+  第2步 
+  config/index.js中配置代理
+   proxyTable: {
+      '/api': {
+        target:'http://127.0.0.1:8888/',
+        // secure: false, // 如果是https接口，需要配置这个参数
+        changeOrigin: true,
+        ws: true,
+        pathRewrite:{
+          '^/api': ''
+        }
+      }
+    },
+    第3步请求
+     this.axios.get("/api/user/list.action?page=1&rows=10").then(result=>{
+                    //成功回调
+                    if(result.data.status==="ok"){
+                          Toast("ok!!")
+                    }
+                    //失败回调
+                    else{
+                        Toast("fail!!")
+                    }
+        }) 

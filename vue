@@ -58,3 +58,8 @@ cnpm i vue-cli -g
                         Toast("fail!!")
                     }
         }) 
+ 6、css3flex 新特性   里面的标签浮动 内容2端对齐
+    p{
+       display:flex;
+       justify-content:space-between;
+    }

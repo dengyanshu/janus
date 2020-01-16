@@ -63,3 +63,15 @@ cnpm i vue-cli -g
        display:flex;
        justify-content:space-between;
     }
+    
+    
+ 7、mainjs中全局过滤器和moment的使用
+   安装moment
+   mainjs中 
+       1\全局引入  import moment from 'moment'
+       //pattern如果为空就以默认的初始化值传入
+       2\Vue.filter('dateFormat',function(str,pattern="YYYY-MM-DD HH:mm:ss"){
+                  此moment已经相当于 var moment=require('moment')生成 可以直接使用  不需要new
+                  return  moment(str).format(pattern)  
+       }) 
+   

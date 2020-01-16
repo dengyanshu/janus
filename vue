@@ -30,7 +30,7 @@ cnpm i vue-cli -g
    position:absloute;可以解决页面上下跳动
 4、v-enter-active  v-leave-active
 
-5、使用axios跨域请求数据
+5、使用axios跨域请求数据(注意有可能与vue-resources冲突)
   import axios  from 'axios'
   import VueAxios from 'vue-axios'
   Vue.use(VueAxios, axios)

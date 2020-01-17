@@ -84,3 +84,10 @@ cnpm i vue-cli -g
    在组件中         import comment from './comment.vue'
    在组件属性中注册  components:{'comment':comment}
    在<template>  <comment :id="newsid"></comment>  子组件中 用props:['id']来接收
+   点击更多  this.page++; this.getNewsComment();   
+   getNewsComment(){
+      this.comments=this.comments.concat(res.data);//不清空列表  原列表基础上添加
+   }
+   
+
+10、

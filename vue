@@ -75,3 +75,6 @@ cnpm i vue-cli -g
                   return  moment(str).format(pattern)  
        }) 
    
+8、路由路径获取
+    <router-link  :to="'/home/newsinfo/'+item.id">
+    然后下一个页面路由路径会是/home/newsinfo/1 这样子

@@ -77,4 +77,5 @@ cnpm i vue-cli -g
    
 8、路由路径获取
     <router-link  :to="'/home/newsinfo/'+item.id">
-    然后下一个页面路由路径会是/home/newsinfo/1 这样子
+    然后下一个页面路由路径会是/home/newsinfo/1 这样子    $route.params.id获取
+    新闻详情页面会有图片不全bug  去掉style里面的 scope可以解决

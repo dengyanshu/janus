@@ -79,3 +79,8 @@ cnpm i vue-cli -g
     <router-link  :to="'/home/newsinfo/'+item.id">
     然后下一个页面路由路径会是/home/newsinfo/1 这样子    $route.params.id获取
     新闻详情页面会有图片不全bug  去掉style里面的 scope可以解决
+    
+9、评论子组件
+   在组件中         import comment from './comment.vue'
+   在组件属性中注册  components:{'comment':comment}
+   在<template>  <comment :id="newsid"></comment>  子组件中 用props:['id']来接收

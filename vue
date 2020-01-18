@@ -24,11 +24,12 @@ cnpm i vue-cli -g
   
 -------------------vue项目
 1、index.html   <body style="background-color:white">  整个app会是白色主基调
-2、app.vue  padding-top:40px 留出title位置   overflow-X:hidden;//动画的时候不会飘
+2、app.vue  padding-top:40px 留出title位置   overflow-X:hidden;//动画的时候不会飘    mint-ui的header组件 z-index:99 在上面
 3、v-enter  与v-leave-to 分开写  
    transform:translateX（100%或者-100%）进入的时候100%横向 v-leave-to 离开的时候-100%从页面最左边离开效果
    position:absloute;可以解决页面上下跳动
 4、v-enter-active  v-leave-active
+    router对象中使用 linkActiveClass:'mui-active'
 
 5、使用axios跨域请求数据(注意有可能与vue-resources冲突)
   import axios  from 'axios'

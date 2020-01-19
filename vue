@@ -102,4 +102,35 @@ cnpm i vue-cli -g
    f：动态加载的数据 array.unshift({"id":0,"name":"全部"})返回的是数组长度 
    g: 动态class :class="['mui-yuanlaistye',item.id==0?'mui-active':'']"当id为0的时候加样式激活其他全白色 
       当点击的时候会其他变蓝
+11、lazy懒加载图片
+   <ul>
+  <li v-for="item in list">
+    <img v-lazy="item">
+  </li>
+</ul>
+<Style>
+ul{
+   list-style:none;
+   margin:0;
+   padding:0;
+}
+li{
+  text-align:center;内容居中
+  box-shadow:0 0 9px #fff;
+  position:relative;
+}
+img{
    
+   vertical-align: middle;//图片三要素
+}
+//内容div
+div{
+   positon:absloute;
+   bottom:0;
+   background:rgba(0,0,0,0.4)
+}
+img[lazy=loading] {
+  width: 40px;
+  height: 300px;
+  margin: auto;
+}

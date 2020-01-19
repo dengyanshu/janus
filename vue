@@ -91,4 +91,11 @@ cnpm i vue-cli -g
    }
    
 
-10、
+10、mui 顶部拖动选项卡使用
+   a：找到mui explames里面顶部拖动选项卡的html文件
+   b: 去掉mui-fullscreen class 
+   c: 由于是mui js控件 需要在当前vue中导入import  mui  from '../lb/mui/mui.js'(需要解除webpack打包严格模式 安装插件 .babelrc配置)
+   d: 在当前vue的生命周期中加入 mounted(){
+      mui().scroll()
+   }
+   e:mui-tab-item样式冲突 需要在app.vue中重命名所有mui-tab-item相关的样式

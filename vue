@@ -99,3 +99,7 @@ cnpm i vue-cli -g
       mui().scroll()
    }
    e:mui-tab-item样式冲突 需要在app.vue中重命名所有mui-tab-item相关的样式
+   f：动态加载的数据 array.unshift({"id":0,"name":"全部"})返回的是数组长度 
+   g: 动态class :class="['mui-yuanlaistye',item.id==0?'mui-active':'']"当id为0的时候加样式激活其他全白色 
+      当点击的时候会其他变蓝
+   
